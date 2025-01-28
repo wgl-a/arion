@@ -48,11 +48,20 @@ in
         NixOS configuration can be used in other ways.
       '';
     };
+
+    nixos.extraModules = lib.mkOption {
+      type = types.listOf types.unspecified;
+      default = [];
+      description = ''
+        Additional NixOS modules to include in the container.
+        Useful for inserting custom modules that may not be on nixpkgs.
+      '';
+    };
   };
 
   config = {
     nixos.build = builtins.addErrorContext "while evaluating the service nixos configuration" (
-      pkgs.nixos config.nixos.configuration
+      pkgs.nixos (config.nixos.configuration ++ config.nixos.extraModules)
     );
     nixos.configuration = { config, ... }: { system.build.theConfig = config; };
     nixos.evaluatedConfig = config.nixos.build.theConfig;
